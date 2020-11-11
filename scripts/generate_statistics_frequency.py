@@ -1,0 +1,174 @@
+import sys
+
+#######################
+#
+# LOCAL FUNCTIONS
+#
+#######################
+
+def print_experiment_line(problem_type, log_path, freq):
+
+
+    instances_matching = ["matching1.col", "matching2.col", "matching3.col", "matching4.col", "matching5.col",
+                          "matching6.col", "matching7.col", "matching8.col", "matching9.col", "matching10.col",
+                          "matching11.col", "matching12.col", "matching13.col", "matching14.col",
+                          "matching15.col", "matching16.col"]
+
+    instances_stableset = ["mug100_1.col", "mug100_25.col", "queen10_10.col", "4-FullIns_3.col",
+                           "games120.col", "queen11_11.col", "DSJC125.1.col", "DSJC125.5.col", "miles250.col",
+                           "miles500.col", "miles750.col", "miles1000.col", "miles1500.col", "anna.col",
+                           "queen12_12.col", "2-Insertions_4.col"]
+
+    opt_vals = { "matching1.col": 30, "matching2.col": 33, "matching3.col": 36, "matching4.col": 39,
+                 "matching5.col": 42, "matching6.col": 45, "matching7.col": 48,"matching8.col": 51,
+                 "matching9.col": 54, "matching10.col": 57, "matching11.col": 60, "matching12.col": 63,
+                 "matching13.col": 66, "matching14.col": 69, "matching15.col": 72, "matching16.col": 75,
+                 "mug100_1.col": 37.166666666666664, "mug100_25.col": 38.0, "queen10_10.col": 10.0,
+                 "4-FullIns_3.col": 55.0, "games120.col": 22.0, "queen11_11.col": 11.0,
+                 "DSJC125.1.col": 43.1408510638298, "DSJC125.5.col": 15.37608584906174,
+                 "miles250.col": 44.0, "miles500.col": 18.5, "miles750.col": 12.0, "miles1000.col": 8.0,
+                 "miles1500.col": 5.0, "anna.col": 80.0, "queen12_12.col": 12.0, "2-Insertions_4.col": 74.5 }
+
+
+    instances = []
+    if problem_type == "matching":
+        instances = instances_matching
+    else:
+        instances = instances_stableset
+
+
+    nsolved_LP = 0
+    nsolved_polar = 0
+    nsolved_polar_opt = 0
+
+    niter_LP = 0
+    niter_polar = 0
+    niter_polar_opt = 0
+
+    for inst in instances:
+
+        optval = opt_vals[inst]
+        
+        f = open(log_path + "/%s_prec_0.001000_corrfreq_%d_initconss_2_solver_gurobi_%s_lbopt_%d.txt" % (inst, freq, problem_type, optval))
+
+        # get dual values polar algorithm
+        line = f.readline()
+        line = f.readline()
+        dual_vals_polar_opt = list(line.split())
+
+        # get dual values LP
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        dual_vals_LP = line.split()
+    
+        f.close()
+
+        # update statistics
+        niter_polar_opt += 1000     # in case we don't solve the instance
+        for i in range(len(dual_vals_polar_opt)):
+            if float(dual_vals_polar_opt[i]) / optval < 1.01:
+                niter_polar_opt += (i + 1) - 1000 # in case we solve the instance
+                nsolved_polar_opt += 1
+                break
+
+        niter_LP += 1000     # in case we don't solve the instance
+        for i in range(len(dual_vals_LP)):
+            if float(dual_vals_LP[i]) / optval < 1.01:
+                niter_LP += (i + 1) - 1000 # in case we solve the instance
+                nsolved_LP += 1
+                break
+                
+
+        # get also values for optimally initialized instances
+        if freq == 0:
+            continue
+        
+        f = open(log_path + "/%s_prec_0.001000_corrfreq_%d_initconss_2_solver_gurobi_%s.txt" % (inst, freq, problem_type))
+
+        # get dual values polar algorithm
+        line = f.readline()
+        line = f.readline()
+        dual_vals_polar = line.split()
+
+        f.close()
+
+        niter_polar += 1000     # in case we don't solve the instance
+        for i in range(len(dual_vals_polar)):
+            if float(dual_vals_polar[i]) / optval < 1.01:
+                niter_polar += (i + 1) - 1000 # in case we solve the instance
+                nsolved_polar += 1
+                break
+
+    # print statistics
+    avg_iter_polar = niter_polar / len(instances)
+    avg_iter_polar_opt = niter_polar_opt / len(instances)
+    avg_iter_LP = niter_LP / len(instances)
+
+
+    if freq == 0:
+        print("      %12s & %4s & %4.2f\\\\" % ("frequency %d" % freq, "---", avg_iter_polar_opt))
+    else:
+        print("      %12s & %4.2f & %4.2f\\\\" % ("frequency %d" % freq, avg_iter_polar, avg_iter_polar_opt))
+
+    # also print LP line
+    if freq == 10:
+        print("      %12s & \\multicolumn{2}{c}{%4.2f}\\\\" % ("LP", avg_iter_LP))
+        
+
+
+def print_new_section(problem_type):
+
+    problemname = ""
+    if problem_type == "matching":
+        problemname = "maximum matching"
+    elif problem_type == "stableset":
+        problemname = "maximum stable set"
+
+    print("      \\midrule")
+    print("      \\multicolumn{3}{@{}l}{%s:}\\\\" % problemname)
+
+def print_statistics_header():
+    print("% generated by generate_statistics_frequencies.py")
+    print("\\begin{table}[t]")
+    print("  \\begin{scriptsize}")
+    print("    \\caption{Comparison of iteration counts for different frequencies of fully corrective step.}")
+    print("    \\label{tab:itercntFrequency}")
+    print("    \\begin{tabular*}{\\textwidth}{@{}l@{\\;\\;\\extracolsep{\\fill}}cc@{}}\\toprule")
+    print("      initialization: & standard & optimal\\\\")
+
+def print_statistics_footer():
+
+    print("      \\bottomrule")
+    print("    \\end{tabular*}")
+    print("  \\end{scriptsize}")
+    print("\\end{table}")
+
+
+#######################
+#
+# MAIN PART
+#
+#######################
+   
+    
+log_path = sys.argv[1]
+
+print_statistics_header()
+
+print_new_section("matching")
+
+print_experiment_line("matching", log_path, 0)
+print_experiment_line("matching", log_path, 1)
+print_experiment_line("matching", log_path, 10)
+
+print_new_section("stableset")
+
+print_experiment_line("stableset", log_path, 0)
+print_experiment_line("stableset", log_path, 1)
+print_experiment_line("stableset", log_path, 10)
+
+
+print_statistics_footer()
+        
