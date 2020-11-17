@@ -81,10 +81,7 @@ def print_experiment_line(problem_type, log_path, freq):
                 break
                 
 
-        # get also values for optimally initialized instances
-        if freq == 0:
-            continue
-        
+        # get also values for not optimally initialized instances
         f = open(log_path + "/%s_prec_0.001000_corrfreq_%d_initconss_2_solver_gurobi_%s.txt" % (inst, freq, problem_type))
 
         # get dual values polar algorithm
@@ -106,11 +103,7 @@ def print_experiment_line(problem_type, log_path, freq):
     avg_iter_polar_opt = niter_polar_opt / len(instances)
     avg_iter_LP = niter_LP / len(instances)
 
-
-    if freq == 0:
-        print("      %12s & %4s & %4.2f\\\\" % ("frequency %d" % freq, "---", avg_iter_polar_opt))
-    else:
-        print("      %12s & %4.2f & %4.2f\\\\" % ("frequency %d" % freq, avg_iter_polar, avg_iter_polar_opt))
+    print("      %12s & %4.2f & %4.2f\\\\" % ("frequency %d" % freq, avg_iter_polar, avg_iter_polar_opt))
 
     # also print LP line
     if freq == 10:

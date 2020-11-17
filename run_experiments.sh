@@ -2,7 +2,6 @@
 # specify test data
 PREC=0.001
 FREQS=( 1 10 )
-OPTFREQS=( 0 1 10 )
 INITCONSS=( 1 2 )
 SOLVER=gurobi
 MAXITER=1000
@@ -79,7 +78,7 @@ touch $OUTFILE
 echo "@01 FREQ TESTS FOR DIFFERENT FREQUENCIES OPTIMAL INITIALIZATION" >> $OUTFILE
 echo "@02 matching" >> $OUTFILE
 echo "frequency tests for matching" >> $OUTFILE
-for F in ${OPTFREQS[@]}
+for F in ${FREQS[@]}
 do
     echo "@03 frequency ${F}" >> $OUTFILE
     for I in ${MATCHINGINSTANCES[@]}
@@ -90,7 +89,7 @@ do
 done
 echo "@02 stable set" >> $OUTFILE
 echo "frequency tests for stable set" >> $OUTFILE
-for F in ${OPTFREQS[@]}
+for F in ${FREQS[@]}
 do
     echo "@03 frequency ${F}" >> $OUTFILE
     for I in ${STABLEINSTANCES[@]}
