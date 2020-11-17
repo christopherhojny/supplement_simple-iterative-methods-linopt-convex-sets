@@ -201,7 +201,7 @@ with particular edge weights.
 To generate instances like in the article, the script has to be
 called with arguments
 
-   100 <30> 3 "matching" <1> 0
+   500 <30> 3 "matching" <1> 0
 
 where <30> and <1> can be varied.
 
