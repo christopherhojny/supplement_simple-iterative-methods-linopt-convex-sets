@@ -1,0 +1,19 @@
+Extract the following files from https://mat.tepper.cmu.edu/COLOR02/
+
+1-FullIns_3.col
+1-Insertions_4.col
+2-FullIns_3.col
+2-Insertions_3.col
+3-Insertions_3.col
+4-Insertions_3.col
+mug100_1.col
+mug100_25.col
+mug88_1.col
+mug88_25.col
+myciel3.col
+myciel4.col
+myciel5.col
+
+and extract all lines starting with "e" as follows
+
+e u v --> u,v,1

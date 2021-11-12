@@ -1,0 +1,93 @@
+Extracted all test sets from https://archive-beta.ics.uci.edu/ml/datasets satisfying the criteria
+
+- multivariate
+- classification
+- ten-to-hundred attributes
+- hundred-to-thousand instances
+
+(accessed on September 3, 2021)
+
+instances with alpha-numeric data or too many ? have not been extracted
+
+
+
+
+
+/ml/machine-learning-databases/statlog/german
+
+german.data.numeric: take last column and transform 1->-1 and 2->1
+
+
+/ml/machine-learning-databases/ionosphere
+
+ionosphere.data: transfromed label g->1 and b->-1
+
+
+/ml/machine-learning-databases/voting-records
+
+house-votes-84: transformed label republican->-1, democrat->1, y->1, n->-1, removed lines with ?
+
+
+/ml/machine-learning-databases/breast-cancer-wisconsin
+
+wpbc-1: removed first column (patient ID) and transformed label N->1, R->-1, removed lines with ?
+
+
+/ml/machine-learning-databases/undocumented/connectionist-bench/sonar
+
+sonar-all: transformed label R->1, M->-1
+
+
+/ml/machine-learning-databases/tic-tac-toe
+
+tic-tac-toe: transformed label positive->1, negative->-1, x->-1, o->1, b->0
+
+
+/ml/machine-learning-databases/statlog/australian
+
+australian-1: transformed label 0->-1
+
+
+/ml/machine-learning-databases/statlog/heart
+
+heart: transformed label 2->-1
+
+
+/ml/machine-learning-databases/echocardiogram
+
+echocardiogram: transformed 0->-1, removed column "name" and deleted lines with ?
+
+
+/ml/machine-learning-databases/spect
+
+spect: transformed 0->-1
+
+
+/ml/machine-learning-databases/parkinsons
+
+parkinsons: removed identifier column and transformed 0->-1
+
+
+/ml/machine-learning-databases/00451
+
+dataR2-1: transformed label 2->-1
+
+
+/ml/machine-learning-databases/00252
+
+pop_failures-2: transformed label 2->-1
+
+
+/ml/machine-learning-databases/00475
+
+audit_risk: transformed label 0->-1, removed rows with non-numerical data and incomplete line (",,")
+
+
+/ml/machine-learning-databases/00351
+
+mesothelioma: transformed label 2->-1
+
+
+/ml/machine-learning-databases/00384
+
+colposkopy-green: transformed label 0->-1

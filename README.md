@@ -1,10 +1,182 @@
+# Content
+
+This repository contains code used for two different articles:
+
+1) A Simple Method for Convex Optimization in the Oracle Model
+
+and
+
+2) Simple Iterative Methods for Linear Optimization over Convex Sets
+
+both by Daniel Dadush, Christopher Hojny, Sophie Huiberts, and Stefan
+Weltge. The code of Article 1 is written in Julia, whereas the code of
+Article 2 is a Python implementation. The different codes are, for
+this reason, contained in the subdirectories "julia" and "python",
+respectively. Note that Article 2 is a previous version of Article 1
+discussing a different algorithm. Thus, the Julia and Python codes do
+not implement the same algorithm.
+
+# 1) A Simple Method for Convex Optimization in the Oracle Model
+
+Additional information about the code for the article
+
+   A Simple Method for Convex Optimization in the Oracle Model
+   by Daniel Dadush, Christopher Hojny, Sophie Huiberts, and Stefan Weltge.
+
+## I PREREQUISITES
+
+To run the code, you need a working installation of
+
+- Julia;
+- Gurobi and its Julia interface via JuMP.
+
+Information on Gurobi can be found at https://www.gurobi.com/.
+JuMP can be found at https://github.com/jump-dev/Gurobi.jl.
+
+Required Julia packages for the main code are
+
+- Dates;
+- DecisionTree;
+- Gurobi;
+- JuMP;
+- LinearAlgebra;
+- Plots.
+
+
+## II STEPS OF THE CODE
+
+1. To run the program, enter "julia main.jl". This will run all test instances
+   listed in "data.jl" using standard parameters.
+
+   Additional parameters can be specified via:
+
+   -p  generate plots, which are stored in "plots/"
+   -r  use relative gaps rather than absolute gaps to generate plots
+   -s  print statistics
+   -v  print log messages
+   -w  write statistics to "statistics/"; each statistics file gets
+       a time stamp to distinguish different runs
+   -i  initialize lower bound by (optimal) value given in "data.jl"
+   -ii use almost optimal initialization
+   -ns disable smart oracles
+
+2. The problems are created and solved using externally defined oracles.
+
+
+### III STRUCTURE OF THE CODE
+
+The code separates the main algorithm and the definition of the oracles to
+be called and the relaxations to be solved. This allows to easily extend
+the code to be able to deal with further problem classes. In Section V
+we explain how to extend the code, whereas this section explains its general
+structure. We illustrate the functionality of the classes that have to
+be provided by a user using matching as an example.
+
+main.jl contains the main routine of the algorithm. Basic
+parameters are defined, a cutting plane loop is called using different oracles
+for generating new cuts, and the statistics/plots are generated. Oracle calls
+and manipulations of LP relaxations are implemented in external classes.
+
+loop.py implements the separation loop.
+
+the four different methods to generate separation candidates are implemented in
+
+analytic.jl
+cutloop.jl
+ellipsoid.jl
+our.jl
+
+using the analytic center, LP solution, midpoint of elliposoid, and the
+point suggested by the conic algorithm as separation candidate
+
+each problem class has its own oracle; for our tests we use
+
+oracle_lpboost.jl
+oracle_matching.jl
+oracle_maxcut.jl
+
+data.jl contains the data used for our experiments
+
+generate_plots_and_statistics.jl contains methods to generate plots and
+statistics
+
+graph.jl contains methods to read and write graphs for the
+matching problems
+
+
+cutloop.py implements a cutting plane procedure.
+
+
+## IV REPRODUCING EXPERIMENTS
+
+To reproduce the experiments, call our code with the following parameters
+
+   julia main.jl -p -r -s -w
+   julia main.jl -p -r -s -w -i
+   julia main.jl -p -r -s -w -ii
+   julia main.jl -p -r -s -w -ns
+
+To be able to run the code successfully, the instances of LPboost and
+from Color02 need to be generated as described in
+
+   instances/lpboost/notes.txt
+   instances/lpboost/color02.txt
+
+If you want to run the code only on the instances provided in this
+repository, you need to replace "data.jl" by "data_selection.jl".
+
+## V EXTENDING THE CURRENT IMPLEMENTATION
+
+To extend the existing code to solve further problem classes, the user
+has to provide a new oracle, and has to tell the main code when to
+call the new oracle. In the following, we assume that the type <type>
+will be used to identify the new problem type.
+
+1. Defining a New Oracle
+
+   A new oracle has to be defined via implementing a struct and two
+   functions.
+
+   The struct contains all data required by the oracle; mandatory data
+   is
+
+   - initineqs inequalities present in the initial relaxation
+   - initeqs   equations present in the initial relaxation
+   - obj       the objective of the problem
+   - R         radius of an origin-centered ball containing the region
+     	       described by the oracle
+   - feastol   feasibility tolerance to decide whether violated
+     	       inequality exists
+
+   The necessary functions are a constructor that reads an instance
+   from a file and sets the data of the struct as well as a function
+   that separates additional inequalities. In the following, we call
+   these functions CONSTRUCTOR and SEPARATOR, respectively.
+
+2. Including the Oracle
+
+   The standard implementation can be extended by adding the new
+   instances to be solved together with the corresponding oracle to
+   "data.jl" via
+
+   push!(names, "new problem type")
+   push!(files, ["/path/to/instance1", ... , "/path/to/instanceN"])
+   push!(ors, CONSTRUCTOR)
+   push!(seps, SEPARATOR)
+
+   and including the new oracle in "main.jl".
+
+
+
+# 2) Simple Iterative Methods for Linear Optimization over Convex Sets
+
 Additional information about the code for the article
 
    Simple Iterative Methods for Linear Optimization over Convex Sets
    by Daniel Dadush, Christopher Hojny, Sophie Huiberts, and Stefan Weltge.
 
 
-I PREREQUISITES
+## I PREREQUISITES
 
 To run the code, you need a working installation of
 
@@ -36,7 +208,7 @@ your operating system does not call Python 3 using the "python" command,
 you need to adapt the respective occurences.
 
 
-II STEPS OF THE CODE
+## II STEPS OF THE CODE
 
 1. To run the program, enter
    "python compare.py --file=</path/to/file> --type=<problemtype>"
@@ -68,7 +240,7 @@ II STEPS OF THE CODE
 3. The problems are created and solved using externally defined oracles.
 
 
-III STRUCTURE OF THE CODE
+## III STRUCTURE OF THE CODE
 
 The code separates the main algorithm and the definition of the oracles to
 be called and the relaxations to be solved. This allows to easily extend
@@ -134,7 +306,7 @@ MIP.py provides basic interface methods to create optimization models
 in SCIP and Gurobi.
 
 
-IV REPRODUCING EXPERIMENTS
+## IV REPRODUCING EXPERIMENTS
 
 To reproduce the experiments, we provided the bash script
 
@@ -206,7 +378,7 @@ called with arguments
 where <30> and <1> can be varied.
 
 
-V EXTENDING THE CURRENT IMPLEMENTATION
+## V EXTENDING THE CURRENT IMPLEMENTATION
 
 To extend the existing code to solve further problem classes, the user has
 to provide a new oracle and relaxation, and has to tell the main code when
